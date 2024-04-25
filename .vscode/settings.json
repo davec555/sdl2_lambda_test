@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "iostream": "cpp"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/davec/prog/lambda",
+            "binaryPath": "/home/davec/prog/lambda/example02_lambda",
+            "binaryArgs": []
+        }
+    ]
+}

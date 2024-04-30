@@ -84,6 +84,129 @@ int main(int argc, char *argv[], char* envp[]){
 		{"togglefullscreen",{[](struct keyboard_func kb) {
 			cout << kb.desc << endl;
 		},"Toggle between window/fullscreen mode"}},
+		{"refreshdisplay",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Refresh the display"}},
+		{"displayboundingbox",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to bounding box"}},
+		{"displaypoints",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to points"}},
+		{"displaywireframe",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to wireframe"}},
+		{"displaywireframehiddensurface",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to hidden surface wireframe"}},
+		{"displaysolid",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to solid"}},
+		{"displaysolidsurfacedetail",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to surface detail solid"}},
+		{"displaysolidedge",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to solid edge"}},
+		{"displaysolidedgesurfacedetail",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Set display to surface detail solid edge"}},
+		{"toggleantialiasing",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle anti-aliasing"}},
+		{"camout",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move camera out/back"}},
+		{"camin",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move camera in/forward"}},
+		{"toggledetails",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle details"}},
+		{"polyfactoradd",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Add to polyfactor"}},
+		{"polyfactorsub",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Subtract from polyfactor"}},		
+		{"showhelp",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Show help"}},
+		{"showinfo",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Show object info"}},
+		{"togglelightingnonconvex",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle non-convex polygon lighting"}},
+		{"togglelighting",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle lighting"}},
+		{"togglematerial",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle material"}},
+		{"togglepositiontype",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle positioning between object/light"}},
+		{"togglenormals",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle normals display"}},
+		{"cyclenonconvex",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Cycle non-convex polygon display hide/only/show"}},
+		{"loadobject",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Load a Lightwave Object (.lwo) file"}},
+		{"toggleignoreenv",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle ignore/respect environmental variables"}},
+		{"toggleprojection",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle projection of object between perspective/orthographic"}},
+		{"toggleaxisstep",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle value of axis movement normal/strong"}},
+		{"togglerotaterings",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle display of rotate rings"}},
+		{"refreshlists",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Refresh display lists of object"}},
+		{"resetposition",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Resets position of object"}},
+		{"toggleshading",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggles shading of object smooth/flat"}},
+		{"toggletessellator",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggles tessellator for non-convex polygons"}},
+		{"runspeedtest",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Runs spinning animation test"}},
+		{"polyunitsadd",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Add to polyunits"}},
+		{"polyunitssub",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Subtract from polyunits"}},
+		{"moveposx",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light to right"}},
+		{"movenegx",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light to left"}},
+		{"moveposy",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light up"}},
+		{"movenegy",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light down"}},
+		{"moveposz",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light towards viewer (zoomin)"}},
+		{"movenegz",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Move object/light away from viewer (zoomout)"}},
 		{"nothing",{[](struct keyboard_func kb) {
 			cout << "function not found (" << kb.desc << ") - doing nothing " << endl;
 		},"no function exists"}}
@@ -114,7 +237,7 @@ int main(int argc, char *argv[], char* envp[]){
 						case SDLK_ESCAPE:
 							running = false;
 							//kbShortCuts.displayKeysConfigVals();
-							//kbShortCuts.writeConfig("dispLWO Config File","displwo1.config");
+							kbShortCuts.writeConfig("dispLWO Config File","displwo1.config");
 						break;
 						default:
 							kbShortCuts.checkKeys(event.key.keysym);

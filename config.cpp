@@ -13,8 +13,8 @@ Config::Config(string name, string parentDebugInfo) {
 	debugInfo = parentDebugInfo + ", " + name;
 }
 
-Config::Config(string configFile, char** envp) {
-	while (*envp) {
+Config::Config(string configFile, char** envp, string noGroupSearchKey) {
+	while (envp && *envp) {
 		string envEntry = *envp;
 		size_t pos = envEntry.find('=');
 		if (pos != string::npos) {
@@ -39,28 +39,36 @@ Config::Config(string configFile, char** envp) {
 	char buff[1024];
 	while (fgets(buff, 1024, in)) {
 
+		short ignoreCloseBracket = 0;
 		string line=buff;
-		if ( (line.length() > 2) && (line[0] != '#') && (line.find(')') == string::npos) ) {
+		//if ( (line.length() > 2) && (line[0] != '#') && (line.find(')') == string::npos) ) {
+		if ( (line.length() > 2) && (line[0] != '#') ) {
 			string name;
 			string value;
 			split(line, name, value, '=');
 
 			toLowerStr(name); // added by DC to make case insesitive
-			if (value == "(") {
-				logDebug(cout << "   config: new group '" << name << "'" << endl);
-				Config* newGroup = new Config(name, debugInfo);
-				groupStack.front()->groups[name] = newGroup;
-				groupStack.push_front(newGroup);
-			} else {
-				for (list<Config*>::reverse_iterator i = groupStack.rbegin(); i != groupStack.rend(); ++i) {
-					(*i)->symbolExpand(value);
+			if(((line.find(')') != string::npos) && (name == noGroupSearchKey)) || (line.find(')') == string::npos)) {
+				if(line.find(')') != string::npos)
+					ignoreCloseBracket = 1;
+				//if (value == "(") {
+				if ((value == "(") && (name != noGroupSearchKey)) {
+					logDebug(cout << "   config: new group '" << name << "'" << endl);
+					Config* newGroup = new Config(name, debugInfo);
+					groupStack.front()->groups[name] = newGroup;
+					groupStack.push_front(newGroup);
+				} else {
+					for (list<Config*>::reverse_iterator i = groupStack.rbegin(); i != groupStack.rend(); ++i) {
+						(*i)->symbolExpand(value);
+					}
+					envSymbolExpand(value);
+					logDebug(cout << "   config: name = '" << name << "', value = '" << value << "'" << endl);
+					groupStack.front()->add(name, value);
 				}
-				envSymbolExpand(value);
-				logDebug(cout << "   config: name = '" << name << "', value = '" << value << "'" << endl);
-				groupStack.front()->add(name, value);
 			}
 		}
-		if ( (line.length() > 0) && (line[0] != '#') && (line.find(')') != string::npos) ) {
+		//if ( (line.length() > 0) && (line[0] != '#') && (line.find(')') != string::npos) ) {
+		if ( (line.length() > 0) && (line[0] != '#') && (line.find(')') != string::npos) && (ignoreCloseBracket == 0)) {
 			logDebug(cout << "   end of group" << endl);
 			groupStack.pop_front();
 		}
@@ -90,7 +98,7 @@ void Config::split(string in, string& left, string& right, char c) {
 		right = in.substr(pos+1, string::npos);
 		trim(right);
 	} else {
-		left = in.substr(0, pos-1);
+		left = in.substr(0, pos-1); // make pos (no -1) if getting problem with param=value (with no white space ie, param = value)
 		trim(left);
 		right = in.substr(pos+1, string::npos);
 		trim(right);
@@ -101,13 +109,21 @@ void Config::trim(string& s) {
 	while ( (s.length() > 1) && ( (s[0] == ' ') || (s[0] =='\t') ) ) {
 		s = s.substr(1, string::npos);
 	}
+
 	while ( (s.length() > 1) &&
 			( (s[s.length()-1] == ' ') ||
-			  (s[s.length()-1] == '\t') || 
+			  (s[s.length()-1] == '\t') ||
 			  (s[s.length()-1] == '\n') || 
 			  (s[s.length()-1] == '\r') ) ) {
 		s = s.substr(0, s.length()-1);
 	}
+
+	// Added by DC - accounts for empty vals in a sub-group
+	if(s[s.length()-1] == '\r'){
+		//cout << "carraige return detected " << s.length() << endl;
+		s = s.substr(0, s.length()-1);
+	}	
+
 	if ( (s.length() > 1) && (s[0] == '"') ) {
 		s = s.substr(1, string::npos);
 	}

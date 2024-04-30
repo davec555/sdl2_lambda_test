@@ -3,12 +3,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-//#include <functional>
 #include <iostream>
 #include <bitset>
 #include <vector>
 
-#include "config.h"
+#include "kbshortcuts.h"
 
 using namespace std;
 using bin = std::bitset<16>;
@@ -19,25 +18,6 @@ SDL_GLContext glContext;
 
 const int width = 640;
 const int height = 480;
-//typedef void (*funcPtr)(struct keyboard_func kb);
-typedef struct func{
-	void (*funcPtr)(struct keyboard_func kb);
-	string desc;
-} func;
-
-struct keyboard_func
-{
-   string funcID; //unique id for keyboard callable function
-   string desc; // Simple description of function
-   string key; // key bound to function
-
-   SDL_KeyCode sym; // sdl2 symbol
-   vector<SDL_Keymod> modifierVector;
-   SDL_Keymod modifier;
-   vector<SDL_Keymod> ignoreModifierVector;
-   SDL_Keymod ignoreModifier;
-   void (*func_ptr)(struct keyboard_func kb) {};
-};
 
 void drawCube(float xrf, float yrf, float zrf);
 
@@ -76,11 +56,10 @@ void init(){
 int main(int argc, char *argv[], char* envp[]){   
 
 	init();
-	int myIterator = 0;
-	int match = 0;
 	
+	KBShortCuts kbShortCuts;
 
-	map<string, func> functionMap = {
+	kbShortCuts.functionMap = {
 		{"rotatenegy",{[](struct keyboard_func kb) {
 			cout << kb.desc << endl;
 		},"Rotate -Y"}},
@@ -102,104 +81,15 @@ int main(int argc, char *argv[], char* envp[]){
 		{"togglebgcol",{[](struct keyboard_func kb) {
 			cout << kb.desc << endl;
 		},"Toggle background colour between black/blue"}},
+		{"togglefullscreen",{[](struct keyboard_func kb) {
+			cout << kb.desc << endl;
+		},"Toggle between window/fullscreen mode"}},
 		{"nothing",{[](struct keyboard_func kb) {
 			cout << "function not found (" << kb.desc << ") - doing nothing " << endl;
 		},"no function exists"}}
 	};
-
-	map<string, SDL_KeyCode> keyAliasMap ={
-		{"Enter",SDLK_RETURN},
-		{"<",SDLK_COMMA},
-		{">",SDLK_PERIOD}
-	};
-
-	map<string, SDL_Keymod> keyModAliasMap = {
-		{"NumLock",KMOD_NUM},
-		{"Shift",KMOD_SHIFT},
-		{"CapsLock",KMOD_CAPS},
-		{"None",KMOD_NONE},
-		{"Alt",KMOD_ALT},
-		{"Ctrl",KMOD_CTRL}
-	};
-
-	int numFuncs = functionMap.size();
-	keyboard_func keys[numFuncs] = {};
-	// read config file with environment variable expansion support
-	Config config("displwo.config", envp);
-
-	map<string, Config*> groups = config.getGroups(); // all groups
-	const string qualifierPrefix = "qualifier"; // lowercase prefix for group name
-	const string ignoredQualifierPrefix = "ignoredqualifier"; // lowercase prefix for group name
-	for (map<string, Config*>::iterator i = groups.begin(); i != groups.end(); ++i) {
-		short qualifierHeading = 0;
-		short ignoredQualifierHeading = 0;
-		string groupName = i->first;
-		Config* group = i->second;
-
-		if(functionMap.find(group->pString("function")) != functionMap.end()){
-			//cout << "function found(" << (group->pString("function")) <<")" << endl;
-			keys[myIterator].func_ptr = (functionMap[group->pString("function")]).funcPtr;
-			//cout << "functionMap.desc: " << ((functionMap[group->pString("function")]).desc) << endl;
-			keys[myIterator].desc = (functionMap[group->pString("function")]).desc;
-		} else {
-			//cout << "function not found (" << (group->pString("function")) <<")" << endl;
-			keys[myIterator].func_ptr = (functionMap["nothing"]).funcPtr;
-			//cout << "functionMap.desc: " << ((functionMap[group->pString("function")]).desc) << endl;
-			keys[myIterator].desc = "No description for " + (group->pString("function")) + ". Unknown function";
-		}
-		//cout << "myIterator: " << myIterator << endl;
-		cout << group->pString("function") << ":" << endl;
-		cout << "   Desc: " << keys[myIterator].desc << endl;
-		cout << "   Key : " << group->pString("key") << endl;
-		keys[myIterator].funcID = group->pString("function");
-		if(keyAliasMap.find(group->pString("key")) != keyAliasMap.end()){
-			keys[myIterator].sym = keyAliasMap[group->pString("key")];
-			keys[myIterator].key = SDL_GetKeyName(keys[myIterator].sym);
-			cout << "   Alias: " << SDL_GetKeyName(keys[myIterator].sym) << endl;	
-		} else {
-			keys[myIterator].key = group->pString("key");	
-		}
-		
-		map<string, Config*> subGroups = group->getGroups();
-		for (map<string, Config*>::iterator j = subGroups.begin(); j != subGroups.end(); ++j) {
-               		string subGroupName = j->first;
-               		Config* subGroup = j->second;
-
-			if(subGroup->pString("singlequalifier") != ""){
-				if(subGroup->pString("singlequalifier") != "none"){
-					if((subGroupName.substr(0,qualifierPrefix.length()) == qualifierPrefix) && qualifierHeading == 0) {
-						cout << "   " << qualifierPrefix << ":" << endl;
-						qualifierHeading = 1;
-					}
-					cout << "      " << subGroup->pString("singlequalifier") << endl;
-					if(keyModAliasMap.find(subGroup->pString("singlequalifier")) != keyModAliasMap.end()){
-						keys[myIterator].modifier = (SDL_Keymod)(keys[myIterator].modifier | (keyModAliasMap[subGroup->pString("singlequalifier")]));
-						keys[myIterator].modifierVector.push_back((keyModAliasMap[subGroup->pString("singlequalifier")]));
-						//cout << " -- " << (subGroup->pString("singlequalifier")) << " aliased to " << (keyModAliasMap[subGroup->pString("singlequalifier")]) << endl;
-					} else {
-						cout << "    **" << (subGroup->pString("singlequalifier")) << " not found in keyModAliasMap" << endl;
-					}
-				}
-			}
-			if(subGroup->pString("singleignoredqualifier") != ""){
-				if((subGroupName.substr(0,ignoredQualifierPrefix.length()) == ignoredQualifierPrefix) && ignoredQualifierHeading == 0) {
-					cout << "   " << ignoredQualifierPrefix << ":" << endl;
-					ignoredQualifierHeading = 1;
-				}
-			  	cout << "      " << subGroup->pString("singleignoredqualifier") << endl;
-				//keys[myIterator].ignoreModifier = (SDL_Keymod)(keys[myIterator].ignoreModifier | KMOD_CTRL);
-				if(keyModAliasMap.find(subGroup->pString("singleignoredqualifier")) != keyModAliasMap.end()){
-					keys[myIterator].ignoreModifier = (SDL_Keymod)(keys[myIterator].ignoreModifier | (keyModAliasMap[subGroup->pString("singleignoredqualifier")]));
-					keys[myIterator].ignoreModifierVector.push_back((keyModAliasMap[subGroup->pString("singleignoredqualifier")]));
-					//cout << " -- " << (subGroup->pString("singleignoredqualifier")) << " aliased to " << (keyModAliasMap[subGroup->pString("singleignoredqualifier")]) << endl;
-				} else {
-					cout << "    **" << (subGroup->pString("singleignoredqualifier")) << " not found in keyModAliasMap" << endl;
-				}
-			}
-		}
-		//cout << "  Quals: " << keys[myIterator].modifier << endl;
-		myIterator++;
-	}
+	
+	kbShortCuts.readConfig("displwo.config","key");
 
 	bool running = true;
 
@@ -223,34 +113,11 @@ int main(int argc, char *argv[], char* envp[]){
 					switch(event.key.keysym.sym){
 						case SDLK_ESCAPE:
 							running = false;
+							//kbShortCuts.displayKeysConfigVals();
+							//kbShortCuts.writeConfig("dispLWO Config File","displwo1.config");
 						break;
 						default:
-							for(int i=0; i < numFuncs; i++){
-							  //if(strcmp(SDL_GetKeyName(event.key.keysym.sym) ,keys[i].key) == 0){
-								if(SDL_GetKeyName(event.key.keysym.sym) == keys[i].key){
-									/*cout << "event.key.keysm.mod: " << bin(event.key.keysym.mod) << endl;
-									cout << "modifier: " << bin(keys[i].modifier) << endl;
-									cout << "and: " << bin((event.key.keysym.mod & keys[i].modifier)) << endl;
-									cout << "nand: " << bin(!(event.key.keysym.mod & (event.key.keysym.mod &keys[i].modifier))) << endl;
-									cout << "xor: " << bin(event.key.keysym.mod xor (event.key.keysym.mod & keys[i].modifier)) << endl;
-									cout << "ignoreModifier: " << bin( keys[i].ignoreModifier) << endl;
-									*/
-									if(((event.key.keysym.mod xor (event.key.keysym.mod & keys[i].modifier))-(event.key.keysym.mod & keys[i].ignoreModifier)) == 0){
-										//if((event.key.keysym.mod & keys[i].modifier) || keys[i].modifier == KMOD_NONE)
-										if(keys[i].modifier == KMOD_NONE){
-											keys[i].func_ptr(keys[i]);
-										} else {
-											for (auto& v : keys[i].modifierVector){
-												if(event.key.keysym.mod & v)
-													match++;
-											}
-											if(match == (int)keys[i].modifierVector.size())
-												keys[i].func_ptr(keys[i]);
-											match = 0;
-										}
-									}
-								}
-							}
+							kbShortCuts.checkKeys(event.key.keysym);
 						break;
 					}
 				break;

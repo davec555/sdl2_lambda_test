@@ -6,6 +6,7 @@
 #include <iostream>
 #include <bitset>
 #include <vector>
+#include <algorithm>
 
 #include "kbshortcuts.h"
 
@@ -53,6 +54,35 @@ void init(){
 	glMatrixMode(GL_MODELVIEW);
 }
 
+string toLowerStrCopy(string s){
+	string result;
+	for (char &c : s) {
+		c = tolower(c);
+		result = result+c;
+	}
+	return result;
+}
+
+void showHelp(vector<keyboard_func>* keys){
+	//keys passed by ref as copies(ref) will just waste mem
+	int numKeys = keys->size();
+
+	cout << "Help text " << endl;
+	for(int i=0; i < numKeys; i++){
+		string mods;
+		for (auto& v : (*keys)[i].modifierVectorText){
+			mods = mods + v + " ";
+		}
+
+		if((((*keys)[i].alias != "") && (toLowerStrCopy((*keys)[i].key) != (*keys)[i].alias)))
+			printf("%20s ",(mods + (*keys)[i].key + " (" + (*keys)[i].alias + ")").c_str());
+		else
+			printf("%20s ",(mods + (*keys)[i].key).c_str());
+		
+		cout << " - " << (*keys)[i].desc << endl;;
+	}
+}
+
 int main(int argc, char *argv[], char* envp[]){   
 
 	init();
@@ -60,154 +90,155 @@ int main(int argc, char *argv[], char* envp[]){
 	KBShortCuts kbShortCuts;
 
 	kbShortCuts.functionMap = {
-		{"rotatenegy",{[](struct keyboard_func kb) {
+		{"rotatenegy",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate -Y"}},
-		{"rotateposy",{[](struct keyboard_func kb) {
+		{"rotateposy",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate +Y"}},
-		{"rotatenegx",{[](struct keyboard_func kb) {
+		{"rotatenegx",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate -X"}},
-		{"rotateposx",{[](struct keyboard_func kb) {
+		{"rotateposx",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate +X"}},		
-		{"rotatenegz",{[](struct keyboard_func kb) {
+		{"rotatenegz",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate -Z"}},
-		{"rotateposz",{[](struct keyboard_func kb) {
+		{"rotateposz",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Rotate +Z"}},
-		{"togglebgcol",{[](struct keyboard_func kb) {
+		{"togglebgcol",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle background colour between black/blue"}},
-		{"togglefullscreen",{[](struct keyboard_func kb) {
+		{"togglefullscreen",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle between window/fullscreen mode"}},
-		{"refreshdisplay",{[](struct keyboard_func kb) {
+		{"refreshdisplay",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Refresh the display"}},
-		{"displayboundingbox",{[](struct keyboard_func kb) {
+		{"displayboundingbox",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to bounding box"}},
-		{"displaypoints",{[](struct keyboard_func kb) {
+		{"displaypoints",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to points"}},
-		{"displaywireframe",{[](struct keyboard_func kb) {
+		{"displaywireframe",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to wireframe"}},
-		{"displaywireframehiddensurface",{[](struct keyboard_func kb) {
+		{"displaywireframehiddensurface",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to hidden surface wireframe"}},
-		{"displaysolid",{[](struct keyboard_func kb) {
+		{"displaysolid",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to solid"}},
-		{"displaysolidsurfacedetail",{[](struct keyboard_func kb) {
+		{"displaysolidsurfacedetail",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to surface detail solid"}},
-		{"displaysolidedge",{[](struct keyboard_func kb) {
+		{"displaysolidedge",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to solid edge"}},
-		{"displaysolidedgesurfacedetail",{[](struct keyboard_func kb) {
+		{"displaysolidedgesurfacedetail",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Set display to surface detail solid edge"}},
-		{"toggleantialiasing",{[](struct keyboard_func kb) {
+		{"toggleantialiasing",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle anti-aliasing"}},
-		{"camout",{[](struct keyboard_func kb) {
+		{"camout",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move camera out/back"}},
-		{"camin",{[](struct keyboard_func kb) {
+		{"camin",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move camera in/forward"}},
-		{"toggledetails",{[](struct keyboard_func kb) {
+		{"toggledetails",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle details"}},
-		{"polyfactoradd",{[](struct keyboard_func kb) {
+		{"polyfactoradd",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Add to polyfactor"}},
-		{"polyfactorsub",{[](struct keyboard_func kb) {
+		{"polyfactorsub",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Subtract from polyfactor"}},		
-		{"showhelp",{[](struct keyboard_func kb) {
+		{"showhelp",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
+			showHelp(keys);
 		},"Show help"}},
-		{"showinfo",{[](struct keyboard_func kb) {
+		{"showinfo",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Show object info"}},
-		{"togglelightingnonconvex",{[](struct keyboard_func kb) {
+		{"togglelightingnonconvex",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle non-convex polygon lighting"}},
-		{"togglelighting",{[](struct keyboard_func kb) {
+		{"togglelighting",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle lighting"}},
-		{"togglematerial",{[](struct keyboard_func kb) {
+		{"togglematerial",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle material"}},
-		{"togglepositiontype",{[](struct keyboard_func kb) {
+		{"togglepositiontype",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle positioning between object/light"}},
-		{"togglenormals",{[](struct keyboard_func kb) {
+		{"togglenormals",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle normals display"}},
-		{"cyclenonconvex",{[](struct keyboard_func kb) {
+		{"cyclenonconvex",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Cycle non-convex polygon display hide/only/show"}},
-		{"loadobject",{[](struct keyboard_func kb) {
+		{"loadobject",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Load a Lightwave Object (.lwo) file"}},
-		{"toggleignoreenv",{[](struct keyboard_func kb) {
+		{"toggleignoreenv",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle ignore/respect environmental variables"}},
-		{"toggleprojection",{[](struct keyboard_func kb) {
+		{"toggleprojection",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle projection of object between perspective/orthographic"}},
-		{"toggleaxisstep",{[](struct keyboard_func kb) {
+		{"toggleaxisstep",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle value of axis movement normal/strong"}},
-		{"togglerotaterings",{[](struct keyboard_func kb) {
+		{"togglerotaterings",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Toggle display of rotate rings"}},
-		{"refreshlists",{[](struct keyboard_func kb) {
+		{"refreshlists",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Refresh display lists of object"}},
-		{"resetposition",{[](struct keyboard_func kb) {
+		{"resetposition",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Resets position of object"}},
-		{"toggleshading",{[](struct keyboard_func kb) {
+		{"toggleshading",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
-		},"Toggles shading of object smooth/flat"}},
-		{"toggletessellator",{[](struct keyboard_func kb) {
+		},"Toggle shading of object smooth/flat"}},
+		{"toggletessellator",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
-		},"Toggles tessellator for non-convex polygons"}},
-		{"runspeedtest",{[](struct keyboard_func kb) {
+		},"Toggle tessellator for non-convex polygons"}},
+		{"runspeedtest",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Runs spinning animation test"}},
-		{"polyunitsadd",{[](struct keyboard_func kb) {
+		{"polyunitsadd",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Add to polyunits"}},
-		{"polyunitssub",{[](struct keyboard_func kb) {
+		{"polyunitssub",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Subtract from polyunits"}},
-		{"moveposx",{[](struct keyboard_func kb) {
+		{"moveposx",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light to right"}},
-		{"movenegx",{[](struct keyboard_func kb) {
+		{"movenegx",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light to left"}},
-		{"moveposy",{[](struct keyboard_func kb) {
+		{"moveposy",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light up"}},
-		{"movenegy",{[](struct keyboard_func kb) {
+		{"movenegy",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light down"}},
-		{"moveposz",{[](struct keyboard_func kb) {
+		{"moveposz",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light towards viewer (zoomin)"}},
-		{"movenegz",{[](struct keyboard_func kb) {
+		{"movenegz",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << kb.desc << endl;
 		},"Move object/light away from viewer (zoomout)"}},
-		{"nothing",{[](struct keyboard_func kb) {
+		{"nothing",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
 			cout << "function not found (" << kb.desc << ") - doing nothing " << endl;
 		},"no function exists"}}
 	};

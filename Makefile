@@ -1,5 +1,5 @@
 //CC = ppc-amigaos-g++ -athread=native -Wall
-CC = g++  -Wall
+CC = g++ -Wall
 
 all: example02_lambda.o log.o config.o kbshortcuts.o
 	$(CC) -o example02_lambda example02_lambda.o log.o config.o kbshortcuts.o -lSDL2 -lGLU -lGL -lpthread

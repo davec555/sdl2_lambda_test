@@ -175,6 +175,7 @@ void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
 			if(keyAliasMap[group->pString("key")].mod != KMOD_NONE){
 				keys[myIterator].modifier = keyAliasMap[group->pString("key")].mod;
 				keys[myIterator].modifierVector.push_back(keyAliasMap[group->pString("key")].mod);
+				keys[myIterator].modifierVectorText.push_back(keyModTextNames[keyAliasMap[group->pString("key")].mod]);
 			}
 			keys[myIterator].key = SDL_GetKeyName(keys[myIterator].sym);
 //			cout << "   Alias: " << SDL_GetKeyName(keys[myIterator].sym) << " " << keys[myIterator].modifier << endl;	
@@ -200,6 +201,7 @@ void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
 				if((keyModAliasMap.find(subGroup->pString("singlequalifier")) != keyModAliasMap.end()) && (subGroup->pString("singlequalifier") != "")){
 					keys[myIterator].modifier = (SDL_Keymod)(keys[myIterator].modifier | (keyModAliasMap[subGroup->pString("singlequalifier")]));
 					keys[myIterator].modifierVector.push_back((keyModAliasMap[subGroup->pString("singlequalifier")]));
+					keys[myIterator].modifierVectorText.push_back(keyModTextNames[(keyModAliasMap[subGroup->pString("singlequalifier")])]);
 					//cout << " -- " << (subGroup->pString("singlequalifier")) << " aliased to " << (keyModAliasMap[subGroup->pString("singlequalifier")]) << endl;
 				} else {
 					cout << "    **" << (subGroup->pString("singlequalifier")) << " not found in keyModAliasMap" << endl;
@@ -310,14 +312,14 @@ void KBShortCuts::checkKeys(SDL_Keysym keySym){
 			*/
 			if(((keySym.mod xor (keySym.mod & keys[i].modifier))-(keySym.mod & keys[i].ignoreModifier)) == 0){
 				if(keys[i].modifier == KMOD_NONE){
-					keys[i].func_ptr(keys[i]);
+					keys[i].func_ptr(keys[i],&keys);
 				} else {
 					for (auto& v : keys[i].modifierVector){
 						if(keySym.mod & v)
 							match++;
 					}
 					if(match == (int)keys[i].modifierVector.size())
-						keys[i].func_ptr(keys[i]);
+						keys[i].func_ptr(keys[i],&keys);
 					match = 0;
 				}
 			}

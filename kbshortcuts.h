@@ -6,7 +6,7 @@
 using namespace::std;
 
 typedef struct func{
-	void (*funcPtr)(struct keyboard_func kb);
+	void (*funcPtr)(struct keyboard_func kb, vector <keyboard_func>* keys);
 	string desc;
 } func;
 
@@ -24,10 +24,11 @@ struct keyboard_func
    SDL_KeyCode sym; // sdl2 symbol
    string alias; // user supplied pre-aliased key
    vector<SDL_Keymod> modifierVector;
+   vector<string> modifierVectorText;
    SDL_Keymod modifier;
    vector<SDL_Keymod> ignoreModifierVector;
    SDL_Keymod ignoreModifier;
-   void (*func_ptr)(struct keyboard_func kb) {};
+   void (*func_ptr)(struct keyboard_func kb, vector<keyboard_func>* keys) {};
 };
 
 class KBShortCuts {

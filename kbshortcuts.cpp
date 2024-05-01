@@ -38,7 +38,7 @@ void KBShortCuts::init(void){
 		{KMOD_GUI,"KMOD_LGUI|KMOD_RGUI"}
 	};
 
-	keyModNames ={
+	keyModTextNames ={
 		{KMOD_NONE,"None"},
 		{KMOD_LSHIFT,"LShift"},
 		{KMOD_RSHIFT,"RShift"},
@@ -274,7 +274,7 @@ void KBShortCuts::writeConfig(string description, string configFile){
 			int qualVal = 1;
 			for (auto& v : keys[i].modifierVector){
 				fileOut << "\tqualifier" << qualVal << " = (" << endl;
-				fileOut << "\t\tsinglequalifier = " << keyModNames[v] << endl;
+				fileOut << "\t\tsinglequalifier = " << keyModTextNames[v] << endl;
 				fileOut << "\t)" << endl;
 				qualVal++;
 			}
@@ -283,7 +283,7 @@ void KBShortCuts::writeConfig(string description, string configFile){
 			int qualVal = 1;
 			for (auto& v : keys[i].ignoreModifierVector){
 				fileOut << "\tignoredqualifier" << qualVal << " = (" << endl;
-				fileOut << "\t\tsingleignoredqualifier = " << keyModNames[v] << endl;
+				fileOut << "\t\tsingleignoredqualifier = " << keyModTextNames[v] << endl;
 				fileOut << "\t)" << endl;
 				qualVal++;
 			}

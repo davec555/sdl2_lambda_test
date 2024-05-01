@@ -35,7 +35,7 @@ class KBShortCuts {
       map<string, keySymMod> keyAliasMap;
       map<string, SDL_Keymod> keyModAliasMap;
       map<int, string> keyModSDLNames;
-      map<int, string> keyModNames;
+      map<int, string> keyModTextNames;
       vector<keyboard_func> keys;
       void init(void);
       

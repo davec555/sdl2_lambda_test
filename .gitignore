@@ -1,4 +1,5 @@
 *.exe
 *.o
 example02_lambda
+example02_lambda_glut
 

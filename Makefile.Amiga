@@ -26,7 +26,7 @@ kbshortcuts.o: kbshortcuts.cpp kbshortcuts.h
 	$(CC) -c kbshortcuts.cpp -o kbshortcuts.o
 
 kbshortcuts_glut.o: kbshortcuts.cpp kbshortcuts.h
-	$(CC) -c kbshortcuts.cpp -DGLUT -DFGLUT -o kbshortcuts_glut.o
+	$(CC) -c kbshortcuts.cpp -DGLUT -o kbshortcuts_glut.o
 	
 clean:
 	-echo Cleaning up...

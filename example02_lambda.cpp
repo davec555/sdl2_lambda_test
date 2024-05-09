@@ -1,7 +1,12 @@
-#include <SDL2/SDL.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+#ifdef GLUT
+ #include <GL/glut.h>
+#else
+ #include <GL/gl.h>
+ #include <GL/glu.h>
+#endif 
+ #include <SDL2/SDL.h>
 
 #include <iostream>
 #include <bitset>
@@ -13,18 +18,26 @@
 using namespace std;
 using bin = std::bitset<16>;
 
+#ifndef GLUT
 SDL_Window *window;
 SDL_GLContext glContext;
-
+#endif
 
 const int width = 640;
 const int height = 480;
+
+float xrf = 0, yrf = 0, zrf = 0;
+
+#ifdef GLUT
+  int mainwin;
+  KBShortCuts kbShortCuts;
+#endif
 
 void drawCube(float xrf, float yrf, float zrf);
 
 
 void init(){
-
+#ifndef GLUT
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){ 
 	 	cout << "Unable to init SDL, error: " << SDL_GetError() << endl;
 	 	exit(1);
@@ -42,7 +55,7 @@ void init(){
 	if(window == NULL){
 		exit(1);
 	}
-
+#endif
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0);
 	glDepthFunc(GL_LESS);
@@ -53,6 +66,94 @@ void init(){
 	gluPerspective(45.0f, (float) width / (float) height, 0.1f, 100.0f);
 	glMatrixMode(GL_MODELVIEW);
 }
+
+#ifdef GLUT
+void keyboard(unsigned char key, int x, int y){
+	int mod = glutGetModifiers();
+	GLUT_Keysym myKeySym;
+	myKeySym.sym = key;
+	myKeySym.mod = mod;
+	myKeySym.special = 0;
+
+	switch (mod){
+		case GLUT_ACTIVE_SHIFT:
+			myKeySym.mod = KMOD_SHIFT;
+			break;
+		case GLUT_ACTIVE_CTRL:
+			myKeySym.mod = KMOD_CTRL;
+			break;
+		case GLUT_ACTIVE_ALT:
+			myKeySym.mod = KMOD_ALT;
+			break;
+		default:
+			break;
+	}
+
+	switch(key) {
+		case 27 :
+			cout << "ESC" << endl;
+			exit(0);
+			break;
+		default:
+			//cout << " Unbound key: (" << (int)key << ") " << key << " mod: " << mod << endl;
+			kbShortCuts.checkKeys(myKeySym);
+			break;
+	}
+}
+
+void keyboardSpecial(int key, int x, int y){	
+//  int mod = glutGetModifiers();
+  GLUT_Keysym myKeySym;
+  myKeySym.sym = key;
+  myKeySym.mod = 0;
+  myKeySym.special = 1;
+  myKeySym.scancode = key;
+
+  switch(key) {
+	default:
+		//cout << " Unbound key: (" << (int)key << ") " << key << " mod: " << myKeySym.mod << endl;
+		kbShortCuts.checkKeys(myKeySym);
+		break;
+  }
+}
+
+void display(){
+	xrf -= 0.5; 
+	yrf -= 0.5;
+	zrf -= 0.5;
+
+	drawCube(xrf, yrf, zrf);
+
+	glFlush();
+
+	glutSwapBuffers();
+	glutPostRedisplay();
+}
+
+void myReshape(int w, int h)
+{
+}
+void myMouse(int button, int state, int x, int y){
+}
+void myMotion(int x, int y){
+}
+void glutMyInit(){
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
+    glutInitWindowSize(width,height);
+    glutInitWindowPosition(100,100);
+
+	mainwin = glutCreateWindow("GLUT Test");
+
+    init();
+    glutDisplayFunc(display);
+    glutReshapeFunc(myReshape);
+    glutMouseFunc(myMouse);
+    glutMotionFunc(myMotion);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(keyboardSpecial);
+//    glutIdleFunc();
+}
+#endif
 
 string toLowerStrCopy(string s){
 	string result;
@@ -85,9 +186,14 @@ void showHelp(vector<keyboard_func>* keys){
 
 int main(int argc, char *argv[], char* envp[]){   
 
+#ifdef GLUT
+    glutInit(&argc,argv);
+	glutMyInit();
+#else
 	init();
-	
 	KBShortCuts kbShortCuts;
+#endif	
+	
 
 	kbShortCuts.functionMap = {
 		{"rotatenegy",{[](struct keyboard_func kb, vector<keyboard_func>* keys) {
@@ -247,12 +353,12 @@ int main(int argc, char *argv[], char* envp[]){
 
 	bool running = true;
 
-	float xrf = 0, yrf = 0, zrf = 0;
+//	float xrf = 0, yrf = 0, zrf = 0;
 
+#ifndef GLUT
 	while(running){ 
-	  
 		SDL_Event event;
-	  
+
 		while ( SDL_PollEvent(&event) ){
 			switch(event.type){
 				case SDL_QUIT:
@@ -285,6 +391,7 @@ int main(int argc, char *argv[], char* envp[]){
 		drawCube(xrf, yrf, zrf);
 
 		glFlush();
+
 		SDL_GL_SwapWindow(window);
 	}
 
@@ -297,6 +404,9 @@ int main(int argc, char *argv[], char* envp[]){
 	window = NULL;
 	
 	SDL_Quit();
+#else
+	glutMainLoop();
+#endif
 	return 0;
 }
 

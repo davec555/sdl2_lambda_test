@@ -4,11 +4,17 @@ CC = g++ -Wall
 all: example02_lambda.o log.o config.o kbshortcuts.o
 	$(CC) -o example02_lambda example02_lambda.o log.o config.o kbshortcuts.o -lSDL2 -lGLU -lGL -lpthread
 
+glut: example02_lambda_glut.o log.o config.o kbshortcuts_glut.o
+	$(CC) -o example02_lambda_glut example02_lambda_glut.o log.o config.o kbshortcuts_glut.o -lglut -lGLU -lGL -lpthread
+ 
 lambda:
 	$(CC) -c lambda.cpp -o lambda -lpthread
 
 example02_lambda.o: example02_lambda.cpp kbshortcuts.h
 	$(CC) -c example02_lambda.cpp -o example02_lambda.o
+
+example02_lambda_glut.o: example02_lambda.cpp kbshortcuts.h
+	$(CC) -c example02_lambda.cpp -DGLUT -o example02_lambda_glut.o
 
 log.o: log.cpp log.h
 	$(CC) -c log.cpp -o log.o
@@ -19,9 +25,13 @@ config.o: config.cpp config.h
 kbshortcuts.o: kbshortcuts.cpp kbshortcuts.h
 	$(CC) -c kbshortcuts.cpp -o kbshortcuts.o
 
+kbshortcuts_glut.o: kbshortcuts.cpp kbshortcuts.h
+	$(CC) -c kbshortcuts.cpp -DGLUT -DFGLUT -o kbshortcuts_glut.o
+
 clean:
 	-echo Cleaning up...
 	-rm *.o
 	-rm example02_lambda
+	-rm example02_lambda_glut
 	-echo Done.
 	

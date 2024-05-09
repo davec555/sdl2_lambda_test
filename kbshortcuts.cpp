@@ -1,5 +1,10 @@
 #include <SDL2/SDL.h>
-
+#ifdef GLUT
+ #include <GL/glut.h>
+#endif
+#ifdef FGLUT
+ #include <GL/freeglut_ext.h>
+#endif
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -18,7 +23,43 @@ KBShortCuts::~KBShortCuts(void){
 }
 
 void KBShortCuts::init(void){
-	keyModSDLNames ={
+#ifdef GLUT
+	specialAliasMap ={
+		{GLUT_KEY_F1,"F1"},
+		{GLUT_KEY_F2,"F2"},
+		{GLUT_KEY_F3,"F3"},
+		{GLUT_KEY_F4,"F4"},
+		{GLUT_KEY_F5,"F5"},
+		{GLUT_KEY_F6,"F6"},
+		{GLUT_KEY_F7,"F7"},
+		{GLUT_KEY_F8,"F8"},
+		{GLUT_KEY_F9,"F9"},
+		{GLUT_KEY_F10,"F10"},
+		{GLUT_KEY_F11,"F11"},
+		{GLUT_KEY_F12,"F12"},
+		{GLUT_KEY_LEFT,"Left"},
+		{GLUT_KEY_RIGHT,"Right"},
+		{GLUT_KEY_UP,"Up"},
+		{GLUT_KEY_DOWN,"Down"},
+		{GLUT_KEY_PAGE_UP,"PageUp"},
+		{GLUT_KEY_PAGE_DOWN,"PageDown"},
+		{GLUT_KEY_HOME,"Home"},
+		{GLUT_KEY_END,"End"},
+		{GLUT_KEY_INSERT,"Insert"},
+ #ifdef FGLUT
+		{GLUT_KEY_NUM_LOCK,"NumLock"},
+		{GLUT_KEY_BEGIN,"Begin"},
+		{GLUT_KEY_DELETE,"Delete"},
+		{GLUT_KEY_SHIFT_L,"LShift"},
+		{GLUT_KEY_SHIFT_R,"RShift"},
+		{GLUT_KEY_CTRL_L,"LCtrl"},
+		{GLUT_KEY_CTRL_R,"RCtrl"},
+		{GLUT_KEY_ALT_L,"LAlt"},
+		{GLUT_KEY_ALT_R,"RAlt"},
+ #endif
+	};
+#endif
+	keyModNames ={
 		{KMOD_NONE,"KMOD_NONE"},
 		{KMOD_LSHIFT,"KMOD_LSHIFT"},
 		{KMOD_RSHIFT,"KMOD_RSHIFT"},
@@ -133,7 +174,15 @@ void KBShortCuts::init(void){
 		{"RightGUI",KMOD_RGUI},
 		{"RGUI",KMOD_RGUI}
 	};
+}
 
+string KBShortCuts::toLowerStrCopy(string s){
+	string result;
+	for (char &c : s) {
+		c = tolower(c);
+		result = result+c;
+	}
+	return result;
 }
 
 void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
@@ -177,8 +226,13 @@ void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
 				keys[myIterator].modifierVector.push_back(keyAliasMap[group->pString("key")].mod);
 				keys[myIterator].modifierVectorText.push_back(keyModTextNames[keyAliasMap[group->pString("key")].mod]);
 			}
+#ifndef GLUT
 			keys[myIterator].key = SDL_GetKeyName(keys[myIterator].sym);
 //			cout << "   Alias: " << SDL_GetKeyName(keys[myIterator].sym) << " " << keys[myIterator].modifier << endl;	
+#else
+			keys[myIterator].key = keys[myIterator].sym;
+//			cout << "   Alias: " << SDL_GetKeyName(keys[myIterator].sym) << " " << keys[myIterator].modifier << endl;	
+#endif
 		} else {
 			keys[myIterator].key = group->pString("key");	
 		}
@@ -199,7 +253,11 @@ void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
 				}
 //				cout << "      " << subGroup->pString("singlequalifier") << endl;
 				if((keyModAliasMap.find(subGroup->pString("singlequalifier")) != keyModAliasMap.end()) && (subGroup->pString("singlequalifier") != "")){
+#ifndef GLUT
 					keys[myIterator].modifier = (SDL_Keymod)(keys[myIterator].modifier | (keyModAliasMap[subGroup->pString("singlequalifier")]));
+#else
+					keys[myIterator].modifier = (keys[myIterator].modifier | (keyModAliasMap[subGroup->pString("singlequalifier")]));
+#endif
 					keys[myIterator].modifierVector.push_back((keyModAliasMap[subGroup->pString("singlequalifier")]));
 					keys[myIterator].modifierVectorText.push_back(keyModTextNames[(keyModAliasMap[subGroup->pString("singlequalifier")])]);
 					//cout << " -- " << (subGroup->pString("singlequalifier")) << " aliased to " << (keyModAliasMap[subGroup->pString("singlequalifier")]) << endl;
@@ -215,7 +273,11 @@ void KBShortCuts::readConfig(string configFile,string noGroupSearchKey){
 				}
 //			  	cout << "      " << subGroup->pString("singleignoredqualifier") << endl;
 				if(keyModAliasMap.find(subGroup->pString("singleignoredqualifier")) != keyModAliasMap.end()){
+#ifndef GLUT
 					keys[myIterator].ignoreModifier = (SDL_Keymod)(keys[myIterator].ignoreModifier | (keyModAliasMap[subGroup->pString("singleignoredqualifier")]));
+#else
+					keys[myIterator].ignoreModifier = (keys[myIterator].ignoreModifier | (keyModAliasMap[subGroup->pString("singleignoredqualifier")]));
+#endif
 					keys[myIterator].ignoreModifierVector.push_back((keyModAliasMap[subGroup->pString("singleignoredqualifier")]));
 					//cout << " -- " << (subGroup->pString("singleignoredqualifier")) << " aliased to " << (keyModAliasMap[subGroup->pString("singleignoredqualifier")]) << endl;
 				} else {
@@ -242,14 +304,14 @@ void KBShortCuts::displayKeysConfigVals(void){
 		if(keys[i].modifier != 0){
 			cout << "\tQualifier: " << bin(keys[i].modifier) << endl;
 			for (auto& v : keys[i].modifierVector){
-				cout << "\t\t" << keyModSDLNames[v] << endl;
+				cout << "\t\t" << keyModNames[v] << endl;
 			}
 		} else
 			cout << "\tQualifier: <empty>" << endl;
 		if(keys[i].ignoreModifier != 0){
 			cout << "\tIgnoredQualifier: " << bin(keys[i].ignoreModifier) << endl;
 			for (auto& v : keys[i].ignoreModifierVector){
-				cout << "\t\t" << keyModSDLNames[v] << endl;
+				cout << "\t\t" << keyModNames[v] << endl;
 			}
 		} else
 			cout << "\tIgnoredQualifier: <empty>" << endl;
@@ -296,12 +358,28 @@ void KBShortCuts::writeConfig(string description, string configFile){
 	fileOut.close();
 }
 
+#ifndef GLUT
 void KBShortCuts::checkKeys(SDL_Keysym keySym){
+#else
+void KBShortCuts::checkKeys(GLUT_Keysym keySym){
+#endif
 	int match = 0;
 	int numKeys = keys.size();
-	
+
+#ifdef GLUT
+	if(keySym.special == 1)
+		keySym.sym = specialAliasMap[keySym.scancode];
+#endif
+	//cout << "keySym.sym: " << keySym.sym << endl;
+	//cout << "keySym.mod: " << keySym.mod << endl;
+	//cout << "keyname: " << SDL_GetKeyName(keySym.sym) << endl;
+	//cout << "keySym.mod: " << bin(keySym.mod) << endl;
 	for(int i=0; i < numKeys; i++){
+#ifndef GLUT
 		if(SDL_GetKeyName(keySym.sym) == keys[i].key){
+#else
+		if((toLowerStrCopy(keySym.sym) == toLowerStrCopy(keys[i].key)) || (toLowerStrCopy(keySym.sym) == toLowerStrCopy(keys[i].alias))){
+#endif
 			/*cout << "keyname: " << SDL_GetKeyName(keySym.sym) << endl;
 			cout << "keySym.mod: " << bin(keySym.mod) << endl;
 			cout << "modifier: " << bin(keys[i].modifier) << endl;
@@ -311,6 +389,7 @@ void KBShortCuts::checkKeys(SDL_Keysym keySym){
 			cout << "ignoreModifier: " << bin( keys[i].ignoreModifier) << endl;
 			*/
 			if(((keySym.mod xor (keySym.mod & keys[i].modifier))-(keySym.mod & keys[i].ignoreModifier)) == 0){
+				//cout << "keys.modifier: " << keyModTextNames[keys[i].modifier] << endl;
 				if(keys[i].modifier == KMOD_NONE){
 					keys[i].func_ptr(keys[i],&keys);
 				} else {

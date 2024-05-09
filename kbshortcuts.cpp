@@ -372,6 +372,7 @@ void KBShortCuts::checkKeys(GLUT_Keysym keySym){
 #endif
 	//cout << "keySym.sym: " << keySym.sym << endl;
 	//cout << "keySym.mod: " << keySym.mod << endl;
+	//cout << "keySym.special: " << keySym.special << endl;
 	//cout << "keyname: " << SDL_GetKeyName(keySym.sym) << endl;
 	//cout << "keySym.mod: " << bin(keySym.mod) << endl;
 	for(int i=0; i < numKeys; i++){

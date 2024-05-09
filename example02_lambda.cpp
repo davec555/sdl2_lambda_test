@@ -102,13 +102,40 @@ void keyboard(unsigned char key, int x, int y){
 }
 
 void keyboardSpecial(int key, int x, int y){	
-//  int mod = glutGetModifiers();
-  GLUT_Keysym myKeySym;
-  myKeySym.sym = key;
-  myKeySym.mod = 0;
-  myKeySym.special = 1;
-  myKeySym.scancode = key;
+	int mod = glutGetModifiers();
+	GLUT_Keysym myKeySym;
+	myKeySym.sym = key;
+	myKeySym.mod = 0;
+	myKeySym.special = 1;
+	myKeySym.scancode = key;
 
+	if(mod & GLUT_ACTIVE_SHIFT){
+		myKeySym.mod = myKeySym.mod | KMOD_SHIFT;
+		mod = mod-GLUT_ACTIVE_SHIFT; 
+	}
+	if(mod & GLUT_ACTIVE_CTRL){
+		myKeySym.mod = myKeySym.mod | KMOD_CTRL;
+		mod = mod-GLUT_ACTIVE_CTRL; 
+	}
+	if(mod & GLUT_ACTIVE_ALT){
+		myKeySym.mod = myKeySym.mod | KMOD_ALT;
+		mod = mod-GLUT_ACTIVE_ALT; 
+	}
+
+/*	switch (mod){
+		case GLUT_ACTIVE_SHIFT:
+			myKeySym.mod = KMOD_SHIFT;
+			break;
+		case GLUT_ACTIVE_CTRL:
+			myKeySym.mod = KMOD_CTRL;
+			break;
+		case GLUT_ACTIVE_ALT:
+			myKeySym.mod = KMOD_ALT;
+			break;
+		default:
+			break;
+	}
+*/
   switch(key) {
 	default:
 		//cout << " Unbound key: (" << (int)key << ") " << key << " mod: " << myKeySym.mod << endl;
